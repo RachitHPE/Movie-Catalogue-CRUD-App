@@ -24,9 +24,16 @@ jobs:
           echo "github.event_name: ${{ github.event_name }}"
           echo "github.event.release.target_commitish: ${{ github.event.release.target_commitish }}"
 
-      - name: verify if build only on main branch
-        if: endsWith(github.event.base_ref, 'main') == false
-        run: exit -1
+      - name: Check if the release is from the main branch
+        id: check_branch
+        run: |
+          branch_ref=$(jq -r '.release.target_commitish' "$GITHUB_EVENT_PATH")
+          echo "Branch: $branch_ref"
+          echo "::set-output name=branch::$branch_ref"
+
+      - name: Run build or deploy if on main branch
+        if: steps.check_branch.outputs.branch == 'main'
+        run: echo "Running job because release was cut on the main branch."
 
       - name: Checkout Repo
         uses: actions/checkout@v4
