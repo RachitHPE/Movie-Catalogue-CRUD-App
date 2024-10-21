@@ -16,6 +16,7 @@ jobs:
   changed_files:
     runs-on: ubuntu-latest
     name: Update Target in Delivery Repo
+    if: github.event.base_ref == 'refs/heads/main'
     steps:
       - name: Testing values
         run: |
@@ -23,10 +24,6 @@ jobs:
           echo "github.event.base_ref: ${{ github.event.base_ref }}"
           echo "github.event_name: ${{ github.event_name }}"
           echo "github.event.release.target_commitish: ${{ github.event.release.target_commitish }}"
-
-      - name: verify if build only on main branch
-        if: endsWith(github.event.base_ref, 'main') == false
-        run: exit -1
 
       - name: Checkout Repo
         uses: actions/checkout@v4
